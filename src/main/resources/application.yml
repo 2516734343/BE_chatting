@@ -1,0 +1,19 @@
+spring:
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+  datasource:
+    url: "jdbc:mysql://bjfk-d14.yz02:15152/managenment_system?useUnicode=true&characterEncoding=utf-8\
+    &useSSL=false&zeroDateTimeBehavior=convertToNull&autoReconnect=true&maxReconnects=5&failOverReadOnly=false"
+    username: test_rw
+    password: 54rltyi5BCdcm06wu22A0brvvzU5uDgB
+    driver-class-name: com.mysql.cj.jdbc.Driver
+server:
+  port: 8080
+
+jodconverter:
+  local:
+    enabled: true
+    office-home: /Applications/OpenOffice.app/Contents/
+    max-tasks-per-process: 10
+    port-numbers: 8100
