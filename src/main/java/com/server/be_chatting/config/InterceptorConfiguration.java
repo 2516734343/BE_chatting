@@ -18,10 +18,8 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        //todo 改变路由
         registry.addInterceptor(internalApiAuthInterceptor)
-                .addPathPatterns("/api/system/management/**").excludePathPatterns("/api/system/management/common/**")
-                .excludePathPatterns("/api/system/management/article/preview");
+                .addPathPatterns("/api/be/chatting/**").excludePathPatterns("/api/be/chatting/common/**");
         log.info("InterceptorConfiguration init");
     }
 }
