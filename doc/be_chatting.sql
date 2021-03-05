@@ -31,7 +31,7 @@ create table tag_info
     create_time bigint          not null default 0  comment '创建时间',
     update_time bigint          not null default 0  comment '修改时间',
     PRIMARY KEY (id),
-    KEY `idx_name` (`name`),
+    KEY `idx_name` (`name`)
 )
     ENGINE = InnoDB
     DEFAULT CHARSET = utf8mb4
