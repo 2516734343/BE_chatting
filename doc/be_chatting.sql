@@ -1,11 +1,12 @@
 create table user_info
 (
     id          bigint unsigned not null auto_increment comment '用户ID',
-    username    varchar(128)    not null default '' comment '用户名/昵称',
+    username    varchar(128)    not null default '' comment '用户名',
+    name        varchar(256)    not null default '' comment '昵称',
     password    varchar(128)    not null default '' comment '密码',
     token       varchar(256)    not null default '' comment '用户token',
     type        int             not null default 0  comment '用户类型：1：普通用户，0：超级管理员',
-    sex         bigint          not null default 0  comment '0:男，1：女',
+    sex         int          not null default 0  comment '0:男，1：女',
     age         int             not null default 0  comment '年龄',
     city        varchar(512)    not null default '' comment '城市',
     emotion     int             not null default 0  comment '1：单身，2：离婚，3：已婚，4：恋爱',
