@@ -2,7 +2,7 @@ create table user_info
 (
     id          bigint unsigned not null auto_increment comment '用户ID',
     username    varchar(128)    not null default '' comment '用户名',
-    name        varchar(256)    not null default '' comment '昵称',
+    name        varchar(255)    not null default '' comment '昵称',
     password    varchar(128)    not null default '' comment '密码',
     token       varchar(256)    not null default '' comment '用户token',
     type        int             not null default 0  comment '用户类型：1：普通用户，0：超级管理员',
@@ -28,6 +28,7 @@ create table tag_info
     id          bigint unsigned not null auto_increment comment '标签ID',
     name        varchar(512)    not null default '' comment '标签名称',
     deleted     int             not null default 0  comment '是否删除,1已删除，0未删除',
+    creator     varchar(512)    not null default '' comment '创建人',
     create_time bigint          not null default 0  comment '创建时间',
     update_time bigint          not null default 0  comment '修改时间',
     PRIMARY KEY (id),
@@ -56,8 +57,8 @@ create table user_tag_relation
 create table article_info
 (
     id             bigint unsigned not null auto_increment comment '文档ID',
-    name           varchar(256)    not null default 0      comment '文档名称',
-    path           varchar(256)    not null default ''     comment '文件路径',
+    name           varchar(255)    not null default 0      comment '文档名称',
+    path           varchar(255)    not null default ''     comment '文件路径',
     deleted        int             not null default 0      comment '是否删除,1已删除，0未删除',
     create_time    bigint          not null default 0      comment '创建时间',
     update_time    bigint          not null default 0      comment '修改时间',

@@ -19,9 +19,11 @@ import com.server.be_chatting.constant.ErrorCode;
 import com.server.be_chatting.dao.ArticleInfoRepository;
 import com.server.be_chatting.dao.TagInfoRepository;
 import com.server.be_chatting.dao.UserInfoRepository;
+import com.server.be_chatting.dao.UserTagRelationRepository;
 import com.server.be_chatting.domain.ArticleInfo;
 import com.server.be_chatting.domain.TagInfo;
 import com.server.be_chatting.domain.UserInfo;
+import com.server.be_chatting.domain.UserTagRelation;
 import com.server.be_chatting.enums.DeleteStatusEnums;
 import com.server.be_chatting.enums.LoginStatusEnums;
 import com.server.be_chatting.enums.UserTypeEnums;
@@ -43,6 +45,8 @@ public class CommonService {
     private TagInfoRepository tagInfoRepository;
     @Resource
     private ArticleInfoRepository articleInfoRepository;
+    @Resource
+    private UserTagRelationRepository userTagRelationRepository;
 
     public LoginVo login(String username, String password) {
         LoginVo loginVo = new LoginVo();
@@ -86,13 +90,15 @@ public class CommonService {
             TagVo tagVo = new TagVo();
             tagVo.setTagId(tagInfo.getId());
             tagVo.setTagName(tagInfo.getName());
+            tagVo.setCreator(tagInfo.getCreator());
             tagVoList.add(tagVo);
         });
         return RestListData.create(tagVoList.size(), tagVoList);
     }
 
     public Map<String, Object> register(MultipartFile file, String username,
-            String password, String name, Integer sex, Integer age, String city, Integer emotion, String signature) {
+            String password, String name, Integer sex, Integer age, String city, Integer emotion, String signature,
+            List<Long> tagList) {
         UserInfo userInfo = userInfoRepository.selectByUserName(username);
         if (userInfo != null) {
             throw ServiceException.of(ErrorCode.PARAM_INVALID, "当前用户已经存在");
@@ -112,10 +118,11 @@ public class CommonService {
         newUserInfo.setUpdateTime(System.currentTimeMillis());
         userInfoRepository.insert(newUserInfo);
         uploadFile(file, newUserInfo);
+        relationTag(tagList, newUserInfo.getId());
         return Maps.newHashMap();
     }
 
-    private void uploadFile(MultipartFile file, UserInfo userInfo) {
+    public void uploadFile(MultipartFile file, UserInfo userInfo) {
         try {
             if (file.isEmpty()) {
                 throw ServiceException.of(ErrorCode.PARAM_INVALID, "文件不能为空");
@@ -145,8 +152,22 @@ public class CommonService {
             articleInfo.setCreateTime(System.currentTimeMillis());
             articleInfo.setUpdateTime(System.currentTimeMillis());
             articleInfoRepository.insert(articleInfo);
+            userInfo.setArticleId(articleInfo.getId());
+            userInfoRepository.updateById(userInfo);
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public void relationTag(List<Long> tagIdList, Long userId) {
+        tagIdList.forEach(tagId -> {
+            UserTagRelation userTagRelation = new UserTagRelation();
+            userTagRelation.setUserId(userId);
+            userTagRelation.setTagId(tagId);
+            userTagRelation.setDeleted(DeleteStatusEnums.NOT_DELETE.getCode());
+            userTagRelation.setCreateTime(System.currentTimeMillis());
+            userTagRelation.setUpdateTime(System.currentTimeMillis());
+            userTagRelationRepository.insert(userTagRelation);
+        });
     }
 }

@@ -6,11 +6,11 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 @Data
-public class ArticleInfo {
+public class UserTagRelation {
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
-    private String name;
-    private String path;
+    private Long userId;
+    private Long tagId;
     private Integer deleted;
     private Long createTime;
     private Long updateTime;

@@ -1,5 +1,6 @@
 package com.server.be_chatting.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,13 +54,14 @@ public class CommonController {
 
     @PostMapping("register")
     public RestRsp<Map<String, Object>> register(@RequestParam("file") MultipartFile file, String username,
-            String password, String name, Integer sex, Integer age, String city, Integer emotion, String signature) {
+            String password, String name, Integer sex, Integer age, String city, Integer emotion, String signature,
+            @RequestParam("tagList") List<Long> tagList) {
         if (file == null || StringUtils.isEmpty(username) || StringUtils.isEmpty(password) || StringUtils.isEmpty(name)
                 || sex == null || age == null || StringUtils.isEmpty(city) || emotion == null || StringUtils
                 .isEmpty(signature)) {
             throw ServiceException.of(ErrorCode.PARAM_INVALID, "参数错误");
         }
-        return RestRsp
-                .success(commonService.register(file, username, password, name, sex, age, city, emotion, signature));
+        return RestRsp.success(
+                commonService.register(file, username, password, name, sex, age, city, emotion, signature, tagList));
     }
 }

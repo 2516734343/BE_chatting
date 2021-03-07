@@ -12,6 +12,7 @@ public class TagInfo {
     private Long id;
     private String name;
     private Integer deleted;
+    private String creator;
     private Long createTime;
     private Long updateTime;
 }
