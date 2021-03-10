@@ -20,15 +20,22 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.server.be_chatting.constant.ErrorCode;
 import com.server.be_chatting.dao.ArticleInfoRepository;
+import com.server.be_chatting.dao.CommentInfoRepository;
+import com.server.be_chatting.dao.InvitationLikeRelationRepository;
+import com.server.be_chatting.dao.InvitationRepository;
 import com.server.be_chatting.dao.TagInfoRepository;
 import com.server.be_chatting.dao.UserInfoRepository;
 import com.server.be_chatting.dao.UserTagRelationRepository;
 import com.server.be_chatting.domain.ArticleInfo;
+import com.server.be_chatting.domain.InvitationInfo;
 import com.server.be_chatting.domain.TagInfo;
 import com.server.be_chatting.domain.UserInfo;
 import com.server.be_chatting.domain.UserTagRelation;
 import com.server.be_chatting.enums.DeleteStatusEnums;
 import com.server.be_chatting.exception.ServiceException;
+import com.server.be_chatting.param.PageRequestParam;
+import com.server.be_chatting.vo.InvitationVo;
+import com.server.be_chatting.vo.RestListData;
 import com.server.be_chatting.vo.TagVo;
 import com.server.be_chatting.vo.UserVo;
 import com.server.be_chatting.vo.req.AddTagReq;
@@ -44,6 +51,12 @@ public class UserService {
     private UserTagRelationRepository userTagRelationRepository;
     @Resource
     private ArticleInfoRepository articleInfoRepository;
+    @Resource
+    private InvitationRepository invitationRepository;
+    @Resource
+    private CommentInfoRepository commentInfoRepository;
+    @Resource
+    private InvitationLikeRelationRepository invitationLikeRelationRepository;
     @Autowired
     private CommonService commonService;
 
@@ -178,5 +191,35 @@ public class UserService {
         return Maps.newHashMap();
     }
 
-
+    public RestListData<InvitationVo> getInvitationVoList(PageRequestParam pageRequestParam) {
+        List<InvitationVo> invitationVoList = Lists.newArrayList();
+        List<InvitationInfo> invitationInfoList = invitationRepository.selectListAll();
+        if (CollectionUtils.isEmpty(invitationInfoList)) {
+            return RestListData.create(invitationVoList.size(), invitationVoList);
+        }
+        invitationInfoList.forEach(invitationInfo -> {
+            InvitationVo invitationVo = new InvitationVo();
+            invitationVo.setId(invitationInfo.getId());
+            invitationVo.setContent(invitationInfo.getContent());
+            UserInfo userInfo = userInfoRepository.selectByUserId(invitationInfo.getUserId());
+            if (userInfo != null) {
+                invitationVo.setUserId(userInfo.getId());
+                invitationVo.setUserName(userInfo.getUsername());
+                invitationVo.setName(userInfo.getName());
+                ArticleInfo articleInfo = articleInfoRepository.selectByArticleId(userInfo.getArticleId());
+                if (articleInfo != null) {
+                    invitationVo.setPhoto("localhost:" + port + "/" + articleInfo.getPath());
+                }
+            }
+            invitationVo.setTime(invitationInfo.getCreateTime());
+            Integer likeNum = invitationLikeRelationRepository.selectLikeNumByInvitationId(invitationInfo.getId());
+            Integer commentNum = commentInfoRepository.selectCommentNumByInvitationId(invitationInfo.getId());
+            invitationVo.setLikeNum(likeNum);
+            invitationVo.setCommentNum(commentNum);
+            invitationVoList.add(invitationVo);
+        });
+        int start = pageRequestParam.getStart();
+        int end = Math.min(start + pageRequestParam.getPageSize(), invitationVoList.size());
+        return RestListData.create(invitationVoList.size(), invitationVoList.subList(start, end));
+    }
 }

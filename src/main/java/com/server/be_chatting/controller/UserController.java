@@ -15,9 +15,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.google.common.collect.Maps;
 import com.server.be_chatting.constant.ErrorCode;
 import com.server.be_chatting.exception.ServiceException;
+import com.server.be_chatting.param.PageRequestParam;
 import com.server.be_chatting.service.UserService;
+import com.server.be_chatting.vo.InvitationVo;
+import com.server.be_chatting.vo.RestListData;
 import com.server.be_chatting.vo.RestRsp;
 import com.server.be_chatting.vo.UserVo;
 import com.server.be_chatting.vo.req.AddTagReq;
@@ -74,5 +78,16 @@ public class UserController {
             throw ServiceException.of(ErrorCode.PARAM_INVALID, "参数错误");
         }
         return RestRsp.success(userService.deleteTag(deleteTagReq));
+    }
+
+    @GetMapping("invitation/list")
+    public RestRsp<RestListData<InvitationVo>> getInvitationList(PageRequestParam pageRequestParam) {
+        return RestRsp.success(userService.getInvitationVoList(pageRequestParam));
+    }
+
+    @PostMapping("invitation/like")
+    public RestRsp<Map<String, Object>> invitationLike() {
+        //todo
+        return RestRsp.success(Maps.newHashMap());
     }
 }
