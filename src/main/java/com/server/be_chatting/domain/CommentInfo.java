@@ -6,6 +6,7 @@ import lombok.Data;
 public class CommentInfo {
     private Long id;
     private Long invitationId;
+    private String content;
     private Long userId;
     private Integer deleted;
     private Long createTime;

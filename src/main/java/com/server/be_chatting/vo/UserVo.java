@@ -18,4 +18,5 @@ public class UserVo {
     private String photo;
     private String signature;//个性签名
     private List<TagVo> tagList;
+    private Long time;
 }

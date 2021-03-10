@@ -104,6 +104,7 @@ create table comment_info
     id             bigint unsigned not null auto_increment comment '评论ID',
     invitation_id  bigint          not null default 0      comment '帖子ID',
     user_id        bigint          not null default 0      comment '评论人的用户ID',
+    content        varchar(2056)   not null default ''     comment '评论内容',
     deleted        int             not null default 0      comment '是否删除,1已删除，0未删除',
     create_time    bigint          not null default 0      comment '创建时间',
     update_time    bigint          not null default 0      comment '修改时间',

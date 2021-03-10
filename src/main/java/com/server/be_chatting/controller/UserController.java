@@ -15,17 +15,23 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.google.common.collect.Maps;
 import com.server.be_chatting.constant.ErrorCode;
 import com.server.be_chatting.exception.ServiceException;
 import com.server.be_chatting.param.PageRequestParam;
 import com.server.be_chatting.service.UserService;
+import com.server.be_chatting.vo.CommentVo;
+import com.server.be_chatting.vo.InvitationCommentTopFiveVo;
+import com.server.be_chatting.vo.InvitationLikeTopFiveVo;
 import com.server.be_chatting.vo.InvitationVo;
 import com.server.be_chatting.vo.RestListData;
 import com.server.be_chatting.vo.RestRsp;
 import com.server.be_chatting.vo.UserVo;
 import com.server.be_chatting.vo.req.AddTagReq;
+import com.server.be_chatting.vo.req.DeleteInvitationReq;
 import com.server.be_chatting.vo.req.DeleteTagReq;
+import com.server.be_chatting.vo.req.InvitationCommentReq;
+import com.server.be_chatting.vo.req.InvitationLikeReq;
+import com.server.be_chatting.vo.req.ReleaseInvitationReq;
 
 @RestController
 @RequestMapping("api/be/chatting")
@@ -86,8 +92,70 @@ public class UserController {
     }
 
     @PostMapping("invitation/like")
-    public RestRsp<Map<String, Object>> invitationLike() {
-        //todo
-        return RestRsp.success(Maps.newHashMap());
+    public RestRsp<Map<String, Object>> invitationLike(@RequestBody InvitationLikeReq invitationLikeReq) {
+        if (invitationLikeReq.getInvitationId() == null || invitationLikeReq.getUserId() == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "用户ID或帖子ID不能为空");
+        }
+        return RestRsp.success(userService.invitationLike(invitationLikeReq));
     }
+
+    @PostMapping("invitation/comment")
+    public RestRsp<Map<String, Object>> commentInvitation(@RequestBody InvitationCommentReq invitationCommentReq) {
+        if (invitationCommentReq.getInvitationId() == null || invitationCommentReq.getUserId() == null || StringUtils
+                .isEmpty(invitationCommentReq.getContent())) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "参数错误");
+        }
+        return RestRsp.success(userService.commentInvitation(invitationCommentReq));
+    }
+
+    @PostMapping("invitation/delete")
+    public RestRsp<Map<String, Object>> deleteInvitation(@RequestBody DeleteInvitationReq deleteInvitationReq) {
+        if (deleteInvitationReq.getInvitationId() == null || deleteInvitationReq.getUserId() == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "参数错误");
+        }
+        return RestRsp.success(userService.deleteInvitation(deleteInvitationReq));
+    }
+
+    @GetMapping("invitation/info")
+    public RestRsp<InvitationVo> getInvitationInfo(Long invitationId) {
+        if (invitationId == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "帖子ID不能为空");
+        }
+        return RestRsp.success(userService.getInvitationInfo(invitationId));
+    }
+
+    @GetMapping("invitation/comment/list")
+    public RestRsp<RestListData<CommentVo>> getCommentList(PageRequestParam pageRequestParam, Long invitationId) {
+        if (invitationId == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "帖子ID不能为空");
+        }
+        return RestRsp.success(userService.getCommentList(pageRequestParam, invitationId));
+    }
+
+    @GetMapping("invitation/like/user/list")
+    public RestRsp<RestListData<UserVo>> getInvitationLikeUserList(Long invitationId) {
+        if (invitationId == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "帖子ID不能为空");
+        }
+        return RestRsp.success(userService.getInvitationLikeUserList(invitationId));
+    }
+
+    @PostMapping("invitation/release")
+    public RestRsp<Map<String, Object>> releaseInvitation(@RequestBody ReleaseInvitationReq releaseInvitationReq) {
+        if (releaseInvitationReq.getUserId() == null || StringUtils.isEmpty(releaseInvitationReq.getContent())) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "参数错误");
+        }
+        return RestRsp.success(userService.releaseInvitation(releaseInvitationReq));
+    }
+
+    @GetMapping("invitation/like/top/five/list")
+    public RestRsp<RestListData<InvitationLikeTopFiveVo>> getInvitationLikeTopFive() {
+        return RestRsp.success(userService.getInvitationLikeTopFive());
+    }
+
+    @GetMapping("invitation/comment/top/five/list")
+    public RestRsp<RestListData<InvitationCommentTopFiveVo>> getInvitationCommentTopFive() {
+        return RestRsp.success(userService.getInvitationCommentTopFive());
+    }
+
 }
