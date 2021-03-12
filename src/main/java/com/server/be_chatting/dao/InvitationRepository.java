@@ -18,4 +18,9 @@ public interface InvitationRepository extends BaseMapper<InvitationInfo> {
             + "= 0 limit 1")
     InvitationInfo selectByInvitationIdAndUserId(@Param("invitationId") Long invitationId,
             @Param("userId") Long userId);
+
+    @Select("select count(*) from invitation_info where user_id = #{userId} and deleted = 0 and create_time > "
+            + "#{fromTime} and create_time < #{toTime}")
+    Integer selectByUserIdAndTime(@Param("userId") Long userId, @Param("fromTime") Long fromTime,
+            @Param("toTime") Long toTime);
 }

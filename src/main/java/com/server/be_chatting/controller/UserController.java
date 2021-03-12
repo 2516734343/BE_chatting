@@ -25,13 +25,16 @@ import com.server.be_chatting.vo.InvitationLikeTopFiveVo;
 import com.server.be_chatting.vo.InvitationVo;
 import com.server.be_chatting.vo.RestListData;
 import com.server.be_chatting.vo.RestRsp;
+import com.server.be_chatting.vo.UserActionVo;
 import com.server.be_chatting.vo.UserVo;
 import com.server.be_chatting.vo.req.AddTagReq;
+import com.server.be_chatting.vo.req.AddUserFriendReq;
 import com.server.be_chatting.vo.req.DeleteInvitationReq;
 import com.server.be_chatting.vo.req.DeleteTagReq;
 import com.server.be_chatting.vo.req.InvitationCommentReq;
 import com.server.be_chatting.vo.req.InvitationLikeReq;
 import com.server.be_chatting.vo.req.ReleaseInvitationReq;
+import com.server.be_chatting.vo.req.UserFriendApplyReq;
 
 @RestController
 @RequestMapping("api/be/chatting")
@@ -157,5 +160,60 @@ public class UserController {
     public RestRsp<RestListData<InvitationCommentTopFiveVo>> getInvitationCommentTopFive() {
         return RestRsp.success(userService.getInvitationCommentTopFive());
     }
+
+    @GetMapping("invitation/user/action/list")
+    public RestRsp<UserActionVo> getUserActionList(Long userId) {
+        if (userId == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "userId不能为空");
+        }
+        return RestRsp.success(userService.getUserActionList(userId));
+    }
+
+    @GetMapping("user/recommend/list")
+    public RestRsp<RestListData<UserVo>> getUserRecommendList(Long userId) {
+        if (userId == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "userId不能为空");
+        }
+        return RestRsp.success(userService.getUserRecommendList(userId));
+    }
+
+    @PostMapping("user/friend/add")
+    public RestRsp<Map<String, Object>> addUserFriend(@RequestBody AddUserFriendReq addUserFriendReq) {
+        if (addUserFriendReq.getUserId() == null || addUserFriendReq.getTargetUserId() == null || StringUtils
+                .isEmpty(addUserFriendReq.getContent())) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "参数错误");
+        }
+        return RestRsp.success(userService.addUserFriend(addUserFriendReq));
+    }
+
+    @GetMapping("user/friend/find")
+    public RestRsp<RestListData<UserVo>> searchUserFriend(String search) {
+        return RestRsp.success(userService.searchUserFriend(search));
+    }
+
+    @GetMapping("user/friend/list")
+    public RestRsp<RestListData<UserVo>> getUserFriendList(Long userId) {
+        if (userId == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "参数错误");
+        }
+        return RestRsp.success(userService.getUserFriendList(userId));
+    }
+
+    @GetMapping("user/friend/apply/list")
+    public RestRsp<RestListData<UserVo>> getUserFriendApplyList(Long userId) {
+        if (userId == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "参数错误");
+        }
+        return RestRsp.success(userService.getUserFriendApplyList(userId));
+    }
+
+    @PostMapping("user/friend/apply")
+    public RestRsp<Map<String, Object>> applyUserFriend(@RequestBody UserFriendApplyReq userFriendApplyReq) {
+        if (userFriendApplyReq.getRecordId() == null || userFriendApplyReq.getStatus() == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID,"传参错误");
+        }
+        return RestRsp.success(userService.applyUserFriend(userFriendApplyReq));
+    }
+
 
 }

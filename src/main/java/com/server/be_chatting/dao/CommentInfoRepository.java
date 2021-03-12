@@ -22,8 +22,10 @@ public interface CommentInfoRepository extends BaseMapper<CommentInfo> {
     @Select("SELECT invitation_id,count(*) as num FROM comment_info GROUP BY invitation_id ORDER BY num desc limit 5")
     List<InvitationRelationDto> selectTopFive();
 
-    @Select("select count(*) from comment_info where user_id = #{userId} and deleted = 0")
-    Integer selectCommentNumByUserId(@Param("userId") Long userId);
+    @Select("select count(*) from comment_info where user_id = #{userId} and deleted = 0 and create_time > "
+            + "#{fromTime} and create_time < #{toTime}")
+    Integer selectCommentNumByUserId(@Param("userId") Long userId, @Param("fromTime") Long fromTime,
+            @Param("toTime") Long toTime);
 
     @Select("select * from comment_info where invitation_id = #{invitationId} and user_id = #{userId} and deleted = 0")
     CommentInfo selectByInvitationIdAndUserId(@Param("invitationId") Long invitationId, @Param("userId") Long userId);

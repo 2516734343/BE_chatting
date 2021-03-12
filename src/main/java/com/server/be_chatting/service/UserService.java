@@ -2,12 +2,15 @@ package com.server.be_chatting.service;
 
 
 import java.io.File;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.annotation.Resource;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -18,12 +21,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import com.server.be_chatting.constant.ErrorCode;
 import com.server.be_chatting.dao.ArticleInfoRepository;
 import com.server.be_chatting.dao.CommentInfoRepository;
 import com.server.be_chatting.dao.InvitationLikeRelationRepository;
 import com.server.be_chatting.dao.InvitationRepository;
 import com.server.be_chatting.dao.TagInfoRepository;
+import com.server.be_chatting.dao.UserFriendRelationRepository;
 import com.server.be_chatting.dao.UserInfoRepository;
 import com.server.be_chatting.dao.UserTagRelationRepository;
 import com.server.be_chatting.domain.ArticleInfo;
@@ -31,25 +36,31 @@ import com.server.be_chatting.domain.CommentInfo;
 import com.server.be_chatting.domain.InvitationInfo;
 import com.server.be_chatting.domain.InvitationLikeRelation;
 import com.server.be_chatting.domain.TagInfo;
+import com.server.be_chatting.domain.UserFriendRelation;
 import com.server.be_chatting.domain.UserInfo;
 import com.server.be_chatting.domain.UserTagRelation;
 import com.server.be_chatting.dto.InvitationRelationDto;
 import com.server.be_chatting.enums.DeleteStatusEnums;
+import com.server.be_chatting.enums.UserAddFriendStatusEnums;
 import com.server.be_chatting.exception.ServiceException;
 import com.server.be_chatting.param.PageRequestParam;
+import com.server.be_chatting.util.DateUtil;
 import com.server.be_chatting.vo.CommentVo;
 import com.server.be_chatting.vo.InvitationCommentTopFiveVo;
 import com.server.be_chatting.vo.InvitationLikeTopFiveVo;
 import com.server.be_chatting.vo.InvitationVo;
 import com.server.be_chatting.vo.RestListData;
 import com.server.be_chatting.vo.TagVo;
+import com.server.be_chatting.vo.UserActionVo;
 import com.server.be_chatting.vo.UserVo;
 import com.server.be_chatting.vo.req.AddTagReq;
+import com.server.be_chatting.vo.req.AddUserFriendReq;
 import com.server.be_chatting.vo.req.DeleteInvitationReq;
 import com.server.be_chatting.vo.req.DeleteTagReq;
 import com.server.be_chatting.vo.req.InvitationCommentReq;
 import com.server.be_chatting.vo.req.InvitationLikeReq;
 import com.server.be_chatting.vo.req.ReleaseInvitationReq;
+import com.server.be_chatting.vo.req.UserFriendApplyReq;
 
 @Service
 public class UserService {
@@ -67,6 +78,8 @@ public class UserService {
     private CommentInfoRepository commentInfoRepository;
     @Resource
     private InvitationLikeRelationRepository invitationLikeRelationRepository;
+    @Resource
+    private UserFriendRelationRepository userFriendRelationRepository;
     @Autowired
     private CommonService commonService;
 
@@ -390,4 +403,143 @@ public class UserService {
         });
         return RestListData.create(invitationCommentTopFiveVoList.size(), invitationCommentTopFiveVoList);
     }
+
+    public UserActionVo getUserActionList(Long userId) {
+        UserActionVo userActionVo = new UserActionVo();
+        List<Integer> likeNumList = Lists.newArrayList();
+        List<Integer> commentNumList = Lists.newArrayList();
+        List<Integer> releaseNumList = Lists.newArrayList();
+        long time = System.currentTimeMillis();
+        for (int i = 1; i <= 7; i++) {
+            Integer likeNum = invitationLikeRelationRepository
+                    .selectLikeNumByUserIdAndTime(userId, DateUtil.plusDays(time, -1), time);
+            Integer commentNum =
+                    commentInfoRepository.selectCommentNumByUserId(userId, DateUtil.plusDays(time, -1), time);
+            Integer releaseNum = invitationRepository.selectByUserIdAndTime(userId, DateUtil.plusDays(time, -1), time);
+            likeNumList.add(likeNum);
+            commentNumList.add(commentNum);
+            releaseNumList.add(releaseNum);
+            time = DateUtil.plusDays(time, -1);
+        }
+        Collections.reverse(likeNumList);
+        Collections.reverse(commentNumList);
+        Collections.reverse(releaseNumList);
+        userActionVo.setLikeNum(likeNumList);
+        userActionVo.setCommentNum(commentNumList);
+        userActionVo.setReleaseNum(releaseNumList);
+        return userActionVo;
+    }
+
+    public RestListData<UserVo> getUserRecommendList(Long userId) {
+        List<UserVo> userVoList = Lists.newArrayList();
+        List<UserTagRelation> userTagRelationList = userTagRelationRepository.selectByUserId(userId);
+        if (CollectionUtils.isEmpty(userTagRelationList)) {
+            return RestListData.create(userVoList.size(), userVoList);
+        }
+        List<Long> userTagIds = Lists.newArrayList();
+        userTagRelationList.forEach(userTagRelation -> {
+            userTagIds.add(userTagRelation.getTagId());
+        });
+        List<UserTagRelation> userTagRelations =
+                userTagRelationRepository.selectByTagIdsAndOtherUserId(userTagIds, userId);
+        Set<Long> userIds = Sets.newHashSet();
+        if (CollectionUtils.isEmpty(userTagRelations)) {
+            return RestListData.create(userVoList.size(), userVoList);
+        }
+        userTagRelations.forEach(userTagRelation -> {
+            userIds.add(userTagRelation.getUserId());
+        });
+        userIds.forEach(id -> {
+            UserVo userVo = getUserInfo(id);
+            userVoList.add(userVo);
+        });
+        return RestListData.create(userVoList.size(), userVoList);
+    }
+
+    public Map<String, Object> addUserFriend(AddUserFriendReq addUserFriendReq) {
+        UserFriendRelation userFriendRelation = new UserFriendRelation();
+        UserFriendRelation friendRelation = userFriendRelationRepository
+                .selectByUserIdAndTargetUserId(addUserFriendReq.getUserId(), addUserFriendReq.getTargetUserId());
+        if (friendRelation != null && friendRelation.getStatus().equals(UserAddFriendStatusEnums.APPLY.getCode())) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "当前已经处于申请中");
+        } else if (friendRelation != null && friendRelation.getStatus()
+                .equals(UserAddFriendStatusEnums.REJECT.getCode())) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "当前用户拒绝添加您为好友");
+        } else if (friendRelation != null && friendRelation.getStatus()
+                .equals(UserAddFriendStatusEnums.PASS.getCode())) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "当前用户已经是您的好友");
+        }
+        userFriendRelation.setUserId(addUserFriendReq.getUserId());
+        userFriendRelation.setTargetUserId(addUserFriendReq.getTargetUserId());
+        userFriendRelation.setCreateTime(System.currentTimeMillis());
+        userFriendRelation.setUpdateTime(System.currentTimeMillis());
+        userFriendRelation.setDeleted(DeleteStatusEnums.NOT_DELETE.getCode());
+        userFriendRelation.setStatus(UserAddFriendStatusEnums.APPLY.getCode());
+        userFriendRelationRepository.insert(userFriendRelation);
+        return Maps.newHashMap();
+    }
+
+    public RestListData<UserVo> searchUserFriend(String search) {
+        search = search == null ? StringUtils.EMPTY : search;
+        List<UserVo> userVoList = Lists.newArrayList();
+        List<UserInfo> userInfoList = userInfoRepository.selectUserList();
+        if (CollectionUtils.isEmpty(userInfoList)) {
+            return RestListData.create(userVoList.size(), userVoList);
+        }
+        String finalSearch = search;
+        userInfoList.forEach(userInfo -> {
+            UserVo userVo = getUserInfo(userInfo.getId());
+            if (StringUtils.containsIgnoreCase(userVo.getName(), finalSearch) || StringUtils
+                    .containsIgnoreCase(userVo.getUsername(), finalSearch)) {
+                userVoList.add(userVo);
+            }
+        });
+        return RestListData.create(userVoList.size(), userVoList);
+    }
+
+    public RestListData<UserVo> getUserFriendList(Long userId) {
+        List<UserFriendRelation> userFriendRelations = userFriendRelationRepository.selectUserFriendByUserId(userId);
+        List<UserVo> userVoList = Lists.newArrayList();
+        if (CollectionUtils.isEmpty(userFriendRelations)) {
+            return RestListData.create(userVoList.size(), userVoList);
+        }
+        userFriendRelations.forEach(userFriendRelation -> {
+            UserVo userVo = getUserInfo(userFriendRelation.getUserId());
+            if (userVo != null) {
+                userVo.setRecordId(userFriendRelation.getId());
+                userVoList.add(userVo);
+            }
+        });
+        return RestListData.create(userVoList.size(), userVoList);
+    }
+
+    public RestListData<UserVo> getUserFriendApplyList(Long userId) {
+        List<UserVo> userVoList = Lists.newArrayList();
+        List<UserFriendRelation> userFriendRelations =
+                userFriendRelationRepository.selectUserApplyFriendByUserId(userId);
+        if (CollectionUtils.isEmpty(userFriendRelations)) {
+            return RestListData.create(userVoList.size(), userVoList);
+        }
+        userFriendRelations.forEach(userFriendRelation -> {
+            UserVo userVo = getUserInfo(userFriendRelation.getUserId());
+            if (userVo != null) {
+                userVo.setRecordId(userFriendRelation.getId());
+                userVoList.add(userVo);
+            }
+            userVoList.add(userVo);
+        });
+        return RestListData.create(userVoList.size(), userVoList);
+    }
+
+    public Map<String, Object> applyUserFriend(UserFriendApplyReq userFriendApplyReq) {
+        UserFriendRelation userFriendRelation =
+                userFriendRelationRepository.selectByRecordId(userFriendApplyReq.getRecordId());
+        if (userFriendRelation == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "该申请不存在");
+        }
+        userFriendRelation.setStatus(userFriendApplyReq.getStatus());
+        userFriendRelationRepository.updateById(userFriendRelation);
+        return Maps.newHashMap();
+    }
+
 }

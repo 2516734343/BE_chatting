@@ -16,4 +16,9 @@ public interface UserTagRelationRepository extends BaseMapper<UserTagRelation> {
 
     @Select("select * from user_tag_relation where user_id = #{userId} and tag_id = #{tagId} and deleted = 0 limit 1")
     UserTagRelation selectByUserIdAndTagId(@Param("userId") Long userId, @Param("tagId") Long tagId);
+
+    @Select("<script> select * from user_tag_relation where deleted = 0 and tag_id in <foreach collection ='ids' "
+            + "item='id' open='(' separator=',' close=')'> #{id} </foreach> and user_id != #{userId} </script>")
+    List<UserTagRelation> selectByTagIdsAndOtherUserId(@Param("ids") List<Long> tagIds, @Param("userId") Long userId);
+
 }
