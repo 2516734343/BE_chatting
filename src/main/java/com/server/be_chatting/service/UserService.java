@@ -3,6 +3,7 @@ package com.server.be_chatting.service;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -241,6 +242,7 @@ public class UserService {
             invitationVo.setCommentNum(commentNum);
             invitationVoList.add(invitationVo);
         });
+        invitationVoList.sort((o1, o2) -> o2.getLikeNum().compareTo(o1.getLikeNum()));
         int start = pageRequestParam.getStart();
         int end = Math.min(start + pageRequestParam.getPageSize(), invitationVoList.size());
         return RestListData.create(invitationVoList.size(), invitationVoList.subList(start, end));
