@@ -269,6 +269,7 @@ public class UserService {
         commentInfo.setCreateTime(System.currentTimeMillis());
         commentInfo.setUpdateTime(System.currentTimeMillis());
         commentInfo.setDeleted(DeleteStatusEnums.NOT_DELETE.getCode());
+        commentInfo.setContent(invitationCommentReq.getContent());
         commentInfoRepository.insert(commentInfo);
         return Maps.newHashMap();
     }
