@@ -101,7 +101,7 @@ public class UserService {
         userVo.setCity(userInfo.getCity());
         userVo.setEmotion(userInfo.getEmotion());
         userVo.setPassword(userInfo.getPassword());
-        userVo.setPhoto("localhost:" + port + "/" + articleInfo.getPath());
+        userVo.setPhoto(articleInfo.getPath());
         userVo.setSex(userInfo.getSex());
         userVo.setSignature(userInfo.getSignature());
         List<TagVo> tagVoList = Lists.newArrayList();
@@ -232,7 +232,7 @@ public class UserService {
                 invitationVo.setName(userInfo.getName());
                 ArticleInfo articleInfo = articleInfoRepository.selectByArticleId(userInfo.getArticleId());
                 if (articleInfo != null) {
-                    invitationVo.setPhoto("localhost:" + port + "/" + articleInfo.getPath());
+                    invitationVo.setPhoto(articleInfo.getPath());
                 }
             }
             invitationVo.setTime(invitationInfo.getCreateTime());
@@ -302,7 +302,7 @@ public class UserService {
             invitationVo.setUserName(userInfo.getUsername());
             ArticleInfo articleInfo = articleInfoRepository.selectByArticleId(userInfo.getArticleId());
             if (articleInfo != null) {
-                invitationVo.setPhoto("localhost:" + port + "/" + articleInfo.getPath());
+                invitationVo.setPhoto(articleInfo.getPath());
             }
         }
         invitationVo.setTime(invitationInfo.getCreateTime());
@@ -330,7 +330,7 @@ public class UserService {
                 commentVo.setName(userInfo.getName());
                 ArticleInfo articleInfo = articleInfoRepository.selectByArticleId(userInfo.getArticleId());
                 if (articleInfo != null) {
-                    commentVo.setPhoto("localhost:" + port + "/" + articleInfo.getPath());
+                    commentVo.setPhoto(articleInfo.getPath());
                 }
             }
             commentVo.setTime(commentInfo.getCreateTime());
