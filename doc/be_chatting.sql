@@ -121,6 +121,7 @@ create table user_friend_relation
     id             bigint unsigned not null auto_increment comment '自增ID',
     user_id        bigint          not null default 0      comment '用户ID',
     target_user_id bigint          not null default 0      comment '目标用户ID',
+    content        varchar(1024)   not null default ''     comment '理由',
     status         int             not null default 0      comment '申请状态：1：通过，2：拒绝，3：申请中',
     deleted        int             not null default 0      comment '是否删除,1已删除，0未删除',
     create_time    bigint          not null default 0      comment '创建时间',

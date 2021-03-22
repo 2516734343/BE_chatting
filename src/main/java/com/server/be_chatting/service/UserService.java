@@ -478,6 +478,7 @@ public class UserService {
         userFriendRelation.setUpdateTime(System.currentTimeMillis());
         userFriendRelation.setDeleted(DeleteStatusEnums.NOT_DELETE.getCode());
         userFriendRelation.setStatus(UserAddFriendStatusEnums.APPLY.getCode());
+        userFriendRelation.setContent(addUserFriendReq.getContent());
         userFriendRelationRepository.insert(userFriendRelation);
         return Maps.newHashMap();
     }
@@ -527,6 +528,7 @@ public class UserService {
             UserVo userVo = getUserInfo(userFriendRelation.getUserId());
             if (userVo != null) {
                 userVo.setRecordId(userFriendRelation.getId());
+                userVo.setReason(userFriendRelation.getContent());
                 userVoList.add(userVo);
             }
             userVoList.add(userVo);

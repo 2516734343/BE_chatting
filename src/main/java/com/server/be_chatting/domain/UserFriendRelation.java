@@ -15,4 +15,5 @@ public class UserFriendRelation {
     private Integer deleted;
     private Long createTime;
     private Long updateTime;
+    private String content;
 }
