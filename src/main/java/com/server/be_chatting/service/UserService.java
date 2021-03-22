@@ -531,7 +531,6 @@ public class UserService {
                 userVo.setReason(userFriendRelation.getContent());
                 userVoList.add(userVo);
             }
-            userVoList.add(userVo);
         });
         return RestListData.create(userVoList.size(), userVoList);
     }
