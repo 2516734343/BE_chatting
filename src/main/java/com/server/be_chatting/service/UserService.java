@@ -40,6 +40,7 @@ import com.server.be_chatting.domain.UserFriendRelation;
 import com.server.be_chatting.domain.UserInfo;
 import com.server.be_chatting.domain.UserTagRelation;
 import com.server.be_chatting.dto.InvitationRelationDto;
+import com.server.be_chatting.dto.UserCityDto;
 import com.server.be_chatting.enums.DeleteStatusEnums;
 import com.server.be_chatting.enums.UserAddFriendStatusEnums;
 import com.server.be_chatting.exception.ServiceException;
@@ -622,16 +623,11 @@ public class UserService {
         return RestListData.create(invitationVoList.size(), invitationVoList);
     }
 
-    public RestListData<UserVo> getCityUserList(String city) {
-        List<UserVo> userVoList = Lists.newArrayList();
-        List<UserInfo> userInfoList = userInfoRepository.selectByCity(city);
-        if (CollectionUtils.isEmpty(userInfoList)) {
-            return RestListData.create(userVoList.size(), userVoList);
+    public RestListData<UserCityDto> getCityUserList() {
+        List<UserCityDto> userCityDtoList = userInfoRepository.selectByCity();
+        if (CollectionUtils.isEmpty(userCityDtoList)) {
+            return RestListData.create(0, Lists.newArrayList());
         }
-        userInfoList.forEach(userInfo -> {
-            UserVo userVo = getUserInfo(userInfo.getId());
-            userVoList.add(userVo);
-        });
-        return RestListData.create(userVoList.size(), userVoList);
+        return RestListData.create(userCityDtoList.size(), userCityDtoList);
     }
 }

@@ -8,14 +8,15 @@ import org.apache.ibatis.annotations.Select;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.server.be_chatting.domain.UserInfo;
+import com.server.be_chatting.dto.UserCityDto;
 
 @Mapper
 public interface UserInfoRepository extends BaseMapper<UserInfo> {
     @Select("select * from user_info where username = #{username} and deleted = 0 limit 1")
     UserInfo selectByUserName(@Param("username") String username);
 
-    @Select("select * from user_info where city = #{city} and deleted = 0")
-    List<UserInfo> selectByCity(@Param("city") String city);
+    @Select("select count(*) as value,city as name from user_info group by city,deleted having deleted = 0")
+    List<UserCityDto> selectByCity();
 
     @Select("select * from user_info where deleted = 0")
     List<UserInfo> selectUserList();

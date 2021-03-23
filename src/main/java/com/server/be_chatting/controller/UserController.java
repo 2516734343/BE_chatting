@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.server.be_chatting.constant.ErrorCode;
+import com.server.be_chatting.dto.UserCityDto;
 import com.server.be_chatting.exception.ServiceException;
 import com.server.be_chatting.param.PageRequestParam;
 import com.server.be_chatting.service.UserService;
@@ -245,11 +246,8 @@ public class UserController {
     }
 
     @GetMapping("city/user/list")
-    public RestRsp<RestListData<UserVo>> getCityUserList(String city) {
-        if (StringUtils.isEmpty(city)) {
-            throw ServiceException.of(ErrorCode.PARAM_INVALID, "传参错误");
-        }
-        return RestRsp.success(userService.getCityUserList(city));
+    public RestRsp<RestListData<UserCityDto>> getCityUserList() {
+        return RestRsp.success(userService.getCityUserList());
     }
 
 }
