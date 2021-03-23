@@ -14,6 +14,9 @@ public interface UserInfoRepository extends BaseMapper<UserInfo> {
     @Select("select * from user_info where username = #{username} and deleted = 0 limit 1")
     UserInfo selectByUserName(@Param("username") String username);
 
+    @Select("select * from user_info where city = #{city} and deleted = 0")
+    List<UserInfo> selectByCity(@Param("city") String city);
+
     @Select("select * from user_info where deleted = 0")
     List<UserInfo> selectUserList();
 

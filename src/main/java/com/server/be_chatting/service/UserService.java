@@ -562,4 +562,76 @@ public class UserService {
         return Maps.newHashMap();
     }
 
+    public RestListData<InvitationVo> getUserLikeInvitationList(Long userId) {
+        List<InvitationVo> invitationVoList = Lists.newArrayList();
+        List<InvitationLikeRelation> invitationLikeRelationList =
+                invitationLikeRelationRepository.selectLikeByUserId(userId);
+        if (CollectionUtils.isEmpty(invitationLikeRelationList)) {
+            return RestListData.create(invitationVoList.size(), invitationVoList);
+        }
+        Set<Long> invitationIds = Sets.newHashSet();
+        invitationLikeRelationList.forEach(invitationLikeRelation -> {
+            invitationIds.add(invitationLikeRelation.getInvitationId());
+        });
+        List<InvitationInfo> invitationInfoList = invitationRepository.selectBatchIds(invitationIds);
+        if (CollectionUtils.isEmpty(invitationInfoList)) {
+            return RestListData.create(invitationVoList.size(), invitationVoList);
+        }
+        invitationInfoList.forEach(invitationInfo -> {
+            InvitationVo invitationVo = new InvitationVo();
+            invitationVo.setId(invitationInfo.getId());
+            invitationVo.setContent(invitationInfo.getContent());
+            invitationVo.setTime(invitationInfo.getCreateTime());
+            Integer likeNum = invitationLikeRelationRepository.selectLikeNumByInvitationId(invitationInfo.getId());
+            Integer commentNum = commentInfoRepository.selectCommentNumByInvitationId(invitationInfo.getId());
+            invitationVo.setLikeNum(likeNum);
+            invitationVo.setCommentNum(commentNum);
+            invitationVoList.add(invitationVo);
+        });
+        invitationVoList.sort((o1, o2) -> o2.getLikeNum().compareTo(o1.getLikeNum()));
+        return RestListData.create(invitationVoList.size(), invitationVoList);
+    }
+
+    public RestListData<InvitationVo> getUserCommentInvitationList(Long userId) {
+        List<InvitationVo> invitationVoList = Lists.newArrayList();
+        List<CommentInfo> commentInfoList =
+                commentInfoRepository.selectByUserId(userId);
+        Set<Long> invitationIds = Sets.newHashSet();
+        if (CollectionUtils.isEmpty(commentInfoList)) {
+            return RestListData.create(invitationVoList.size(), invitationVoList);
+        }
+        commentInfoList.forEach(invitationLikeRelation -> {
+            invitationIds.add(invitationLikeRelation.getInvitationId());
+        });
+        List<InvitationInfo> invitationInfoList = invitationRepository.selectBatchIds(invitationIds);
+        if (CollectionUtils.isEmpty(invitationInfoList)) {
+            return RestListData.create(invitationVoList.size(), invitationVoList);
+        }
+        invitationInfoList.forEach(invitationInfo -> {
+            InvitationVo invitationVo = new InvitationVo();
+            invitationVo.setId(invitationInfo.getId());
+            invitationVo.setTime(invitationInfo.getCreateTime());
+            invitationVo.setContent(invitationInfo.getContent());
+            Integer likeNum = invitationLikeRelationRepository.selectLikeNumByInvitationId(invitationInfo.getId());
+            Integer commentNum = commentInfoRepository.selectCommentNumByInvitationId(invitationInfo.getId());
+            invitationVo.setLikeNum(likeNum);
+            invitationVo.setCommentNum(commentNum);
+            invitationVoList.add(invitationVo);
+        });
+        invitationVoList.sort((o1, o2) -> o2.getLikeNum().compareTo(o1.getLikeNum()));
+        return RestListData.create(invitationVoList.size(), invitationVoList);
+    }
+
+    public RestListData<UserVo> getCityUserList(String city) {
+        List<UserVo> userVoList = Lists.newArrayList();
+        List<UserInfo> userInfoList = userInfoRepository.selectByCity(city);
+        if (CollectionUtils.isEmpty(userInfoList)) {
+            return RestListData.create(userVoList.size(), userVoList);
+        }
+        userInfoList.forEach(userInfo -> {
+            UserVo userVo = getUserInfo(userInfo.getId());
+            userVoList.add(userVo);
+        });
+        return RestListData.create(userVoList.size(), userVoList);
+    }
 }

@@ -228,5 +228,28 @@ public class UserController {
                 .success(webSocketService.getUserRecordList(userId, targetUserId));
     }
 
+    @GetMapping("user/like/invitation/list")
+    public RestRsp<RestListData<InvitationVo>> getUserLikeInvitationList(Long userId) {
+        if (userId == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "传参错误");
+        }
+        return RestRsp.success(userService.getUserLikeInvitationList(userId));
+    }
+
+    @GetMapping("user/comment/invitation/list")
+    public RestRsp<RestListData<InvitationVo>> getUserCommentInvitationList(Long userId) {
+        if (userId == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "传参错误");
+        }
+        return RestRsp.success(userService.getUserCommentInvitationList(userId));
+    }
+
+    @GetMapping("city/user/list")
+    public RestRsp<RestListData<UserVo>> getCityUserList(String city) {
+        if (StringUtils.isEmpty(city)) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "传参错误");
+        }
+        return RestRsp.success(userService.getCityUserList(city));
+    }
 
 }

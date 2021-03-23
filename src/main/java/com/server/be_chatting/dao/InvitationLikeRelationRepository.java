@@ -15,8 +15,8 @@ public interface InvitationLikeRelationRepository extends BaseMapper<InvitationL
     @Select("select count(*) from invitation_like_relation where invitation_id = #{invitationId} and deleted = 0")
     Integer selectLikeNumByInvitationId(@Param("invitationId") Long invitationId);
 
-    @Select("select count(*) from invitation_like_relation where user_id = #{userId} and deleted = 0")
-    Integer selectLikeNumByUserId(@Param("userId") Long userId);
+    @Select("select * from invitation_like_relation where user_id = #{userId} and deleted = 0")
+    List<InvitationLikeRelation> selectLikeByUserId(@Param("userId") Long userId);
 
     @Select("select count(*) from invitation_like_relation where user_id = #{userId} and deleted = 0 and create_time "
             + "> #{fromTime} and create_time < #{toTime}")

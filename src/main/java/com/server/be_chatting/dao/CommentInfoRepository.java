@@ -27,6 +27,6 @@ public interface CommentInfoRepository extends BaseMapper<CommentInfo> {
     Integer selectCommentNumByUserId(@Param("userId") Long userId, @Param("fromTime") Long fromTime,
             @Param("toTime") Long toTime);
 
-    @Select("select * from comment_info where invitation_id = #{invitationId} and user_id = #{userId} and deleted = 0")
-    CommentInfo selectByInvitationIdAndUserId(@Param("invitationId") Long invitationId, @Param("userId") Long userId);
+    @Select("select * from comment_info where user_id = #{userId} and deleted = 0")
+    List<CommentInfo> selectByUserId(@Param("userId") Long userId);
 }
