@@ -78,20 +78,16 @@ public class WebSocketController {
     public void sendToUser(ChatMsgDto chatMsg) throws IOException {
         System.out.println("test");
         this.sendMessage(ObjectMapperUtils.toJSON(chatMsg));
-        //        String reviceUserid = chatMsg.getReciveuserid();
-        //        String sendMessage = chatMsg.getSendtext();
-        //        sendMessage= EmojiFilter.filterEmoji(sendMessage);//过滤输入法输入的表情
-        //        chatMsgService.InsertChatMsg(new ChatMsg().setMsgtype(chatMsg.getMsgtype()).setReciveuserid
-        //        (reviceUserid).setSenduserid(userno).setSendtext(sendMessage));
-        //        try {
-        //            if (webSocketSet.get(reviceUserid) != null) {
-        //                webSocketSet.get(reviceUserid).sendMessage(userno+"|"+sendMessage);
-        //            }else{
-        //                webSocketSet.get(userno).sendMessage("0"+"|"+"当前用户不在线");
-        //            }
-        //        } catch (IOException e) {
-        //            e.printStackTrace();
-        //        }
+        String targetUserId = chatMsg.getTargetUserId().toString();
+        try {
+            if (webSocketSet.get(targetUserId) != null) {
+                webSocketSet.get(targetUserId).sendMessage(ObjectMapperUtils.toJSON(chatMsg));
+            } else {
+                webSocketSet.get(targetUserId).sendMessage("0" + "|" + "当前用户不在线");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public void sendMessage(String message) throws IOException {
