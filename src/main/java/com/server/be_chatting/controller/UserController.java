@@ -220,12 +220,12 @@ public class UserController {
     }
 
     @GetMapping("user/chat/record/list")
-    public RestRsp<RestListData<ChatRecordVo>> getChatRecordList(@RequestBody AddUserFriendReq userChatReq) {
-        if (userChatReq.getUserId() == null || userChatReq.getTargetUserId() == null) {
+    public RestRsp<RestListData<ChatRecordVo>> getChatRecordList(Long userId, Long targetUserId) {
+        if (userId == null || targetUserId == null) {
             throw ServiceException.of(ErrorCode.PARAM_INVALID, "传参错误");
         }
         return RestRsp
-                .success(webSocketService.getUserRecordList(userChatReq.getUserId(), userChatReq.getTargetUserId()));
+                .success(webSocketService.getUserRecordList(userId, targetUserId));
     }
 
 
