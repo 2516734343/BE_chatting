@@ -1,5 +1,6 @@
 package com.server.be_chatting.controller;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.websocket.OnClose;
@@ -37,9 +38,9 @@ public class WebSocketController {
      * session 可选的参数。session为与某个客户端的连接会话，需要通过它来给客户端发送数据
      */
     @OnOpen
-    public void onOpen(@PathParam(value = "userId") String userId, Session WebSocketSession) {
+    public void onOpen(@PathParam(value = "userId") String userId, Session webSocketSession) {
         this.userId = userId;//接收到发送消息的人员编号
-        this.WebSocketSession = WebSocketSession;
+        this.WebSocketSession = webSocketSession;
         webSocketSet.put(userId, this);//加入map中
         addOnlineCount();     //在线数加1
     }
@@ -62,7 +63,7 @@ public class WebSocketController {
      * @param session 可选的参数
      */
     @OnMessage
-    public void onMessage(String chatMsg, Session session) {
+    public void onMessage(String chatMsg, Session session) throws IOException {
         //给指定的人发消息
         ChatMsgDto chatMsgDto = ObjectMapperUtils.fromJSON(chatMsg, ChatMsgDto.class);
         sendToUser(chatMsgDto);
@@ -74,8 +75,9 @@ public class WebSocketController {
      *
      * @param chatMsg 消息对象
      */
-    public void sendToUser(ChatMsgDto chatMsg) {
+    public void sendToUser(ChatMsgDto chatMsg) throws IOException {
         System.out.println("test");
+        this.sendMessage(ObjectMapperUtils.toJSON(chatMsg));
         //        String reviceUserid = chatMsg.getReciveuserid();
         //        String sendMessage = chatMsg.getSendtext();
         //        sendMessage= EmojiFilter.filterEmoji(sendMessage);//过滤输入法输入的表情
@@ -92,11 +94,13 @@ public class WebSocketController {
         //        }
     }
 
+    public void sendMessage(String message) throws IOException {
+        this.WebSocketSession.getBasicRemote().sendText(message);
+        //this.session.getAsyncRemote().sendText(message);
+    }
+
     /**
      * 发生错误时调用
-     *
-     * @param session
-     * @param error
      */
     @OnError
     public void onError(Session session, Throwable error) {
