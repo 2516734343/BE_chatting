@@ -11,7 +11,6 @@ import javax.websocket.Session;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.server.be_chatting.dto.ChatMsgDto;
@@ -21,8 +20,7 @@ import com.server.be_chatting.util.ObjectMapperUtils;
 @RestController
 @ServerEndpoint(value = "/api/be/chatting/websocket/{userId}")
 public class WebSocketController {
-    @Autowired
-    private WebSocketService webSocketService;
+    public static WebSocketService webSocketService;
     //静态变量，用来记录当前在线连接数。应该把它设计成线程安全的。
     private static int onlineCount = 0;
     //concurrent包的线程安全Set，用来存放每个客户端对应的MyWebSocket对象。若要实现服务端与单一客户端通信的话，可以使用Map来存放，其中Key可以为用户标识
