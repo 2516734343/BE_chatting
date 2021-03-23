@@ -77,11 +77,12 @@ public class WebSocketController {
      */
     public void sendToUser(ChatMsgDto chatMsg) {
         String targetUserId = chatMsg.getTargetUserId().toString();
+        String userId = chatMsg.getUserId().toString();
         try {
             if (webSocketSet.get(targetUserId) != null) {
                 webSocketSet.get(targetUserId).sendMessage(ObjectMapperUtils.toJSON(chatMsg));
             } else {
-                webSocketSet.get(targetUserId).sendMessage("0" + "|" + "当前用户不在线");
+                webSocketSet.get(userId).sendMessage("当前用户不在线");
             }
         } catch (IOException e) {
             e.printStackTrace();
