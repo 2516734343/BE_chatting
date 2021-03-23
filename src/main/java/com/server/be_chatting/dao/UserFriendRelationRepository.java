@@ -16,6 +16,10 @@ public interface UserFriendRelationRepository extends BaseMapper<UserFriendRelat
     UserFriendRelation selectByUserIdAndTargetUserId(@Param("userId") Long userId,
             @Param("targetUserId") Long targetUserId);
 
+    @Select("select * from user_friend_relation where user_id = #{userId} and target_user_id = #{targetUserId} and deleted = 0 and status = 3 limit 1")
+    UserFriendRelation selectApplyByUserIdAndTargetUserId(@Param("userId") Long userId,
+            @Param("targetUserId") Long targetUserId);
+
     @Select("select * from user_friend_relation where (user_id = #{userId} or target_user_id = #{userId}) and deleted = 0 and status = 1")
     List<UserFriendRelation> selectUserFriendByUserId(@Param("userId") Long userId);
 

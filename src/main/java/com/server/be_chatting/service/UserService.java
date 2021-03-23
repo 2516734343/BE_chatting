@@ -506,10 +506,15 @@ public class UserService {
         if (CollectionUtils.isEmpty(userFriendRelations)) {
             return RestListData.create(userVoList.size(), userVoList);
         }
+        Set<Long> userIdList = Sets.newHashSet();
         userFriendRelations.forEach(userFriendRelation -> {
-            UserVo userVo = getUserInfo(userFriendRelation.getUserId());
+            if (!userFriendRelation.getUserId().equals(userId)) {
+                userIdList.add(userId);
+            }
+        });
+        userIdList.forEach(id -> {
+            UserVo userVo = getUserInfo(id);
             if (userVo != null) {
-                userVo.setRecordId(userFriendRelation.getId());
                 userVoList.add(userVo);
             }
         });
@@ -542,6 +547,13 @@ public class UserService {
         }
         userFriendRelation.setStatus(userFriendApplyReq.getStatus());
         userFriendRelationRepository.updateById(userFriendRelation);
+        UserFriendRelation friendRelation = userFriendRelationRepository
+                .selectApplyByUserIdAndTargetUserId(userFriendRelation.getTargetUserId(),
+                        userFriendRelation.getUserId());
+        if (friendRelation != null) {
+            userFriendRelation.setStatus(userFriendApplyReq.getStatus());
+            userFriendRelationRepository.updateById(userFriendRelation);
+        }
         return Maps.newHashMap();
     }
 
