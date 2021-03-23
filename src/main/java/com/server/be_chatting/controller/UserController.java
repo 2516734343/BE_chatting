@@ -19,6 +19,8 @@ import com.server.be_chatting.constant.ErrorCode;
 import com.server.be_chatting.exception.ServiceException;
 import com.server.be_chatting.param.PageRequestParam;
 import com.server.be_chatting.service.UserService;
+import com.server.be_chatting.service.WebSocketService;
+import com.server.be_chatting.vo.ChatRecordVo;
 import com.server.be_chatting.vo.CommentVo;
 import com.server.be_chatting.vo.InvitationCommentTopFiveVo;
 import com.server.be_chatting.vo.InvitationLikeTopFiveVo;
@@ -42,6 +44,8 @@ import com.server.be_chatting.vo.req.UserFriendApplyReq;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private WebSocketService webSocketService;
 
     @GetMapping("get/user/info")
     public RestRsp<UserVo> getUserInfo(Long userId) {
@@ -210,9 +214,18 @@ public class UserController {
     @PostMapping("user/friend/apply")
     public RestRsp<Map<String, Object>> applyUserFriend(@RequestBody UserFriendApplyReq userFriendApplyReq) {
         if (userFriendApplyReq.getRecordId() == null || userFriendApplyReq.getStatus() == null) {
-            throw ServiceException.of(ErrorCode.PARAM_INVALID,"传参错误");
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "传参错误");
         }
         return RestRsp.success(userService.applyUserFriend(userFriendApplyReq));
+    }
+
+    @GetMapping("user/chat/record/list")
+    public RestRsp<RestListData<ChatRecordVo>> getChatRecordList(@RequestBody AddUserFriendReq userChatReq) {
+        if (userChatReq.getUserId() == null || userChatReq.getTargetUserId() == null) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "传参错误");
+        }
+        return RestRsp
+                .success(webSocketService.getUserRecordList(userChatReq.getUserId(), userChatReq.getTargetUserId()));
     }
 
 

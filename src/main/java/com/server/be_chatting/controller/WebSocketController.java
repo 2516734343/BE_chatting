@@ -63,7 +63,7 @@ public class WebSocketController {
      * @param session 可选的参数
      */
     @OnMessage
-    public void onMessage(String chatMsg, Session session) throws IOException {
+    public void onMessage(String chatMsg, Session session) {
         //给指定的人发消息
         ChatMsgDto chatMsgDto = ObjectMapperUtils.fromJSON(chatMsg, ChatMsgDto.class);
         sendToUser(chatMsgDto);
@@ -75,9 +75,7 @@ public class WebSocketController {
      *
      * @param chatMsg 消息对象
      */
-    public void sendToUser(ChatMsgDto chatMsg) throws IOException {
-        System.out.println("test");
-        this.sendMessage(ObjectMapperUtils.toJSON(chatMsg));
+    public void sendToUser(ChatMsgDto chatMsg) {
         String targetUserId = chatMsg.getTargetUserId().toString();
         try {
             if (webSocketSet.get(targetUserId) != null) {
@@ -87,12 +85,13 @@ public class WebSocketController {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            webSocketService.insertChatRecord(chatMsg);
         }
     }
 
     public void sendMessage(String message) throws IOException {
         this.webSocketSession.getBasicRemote().sendText(message);
-        //this.session.getAsyncRemote().sendText(message);
     }
 
     /**
