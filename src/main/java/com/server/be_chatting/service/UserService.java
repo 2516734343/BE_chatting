@@ -508,13 +508,12 @@ public class UserService {
         }
         Set<Long> userIdList = Sets.newHashSet();
         userFriendRelations.forEach(userFriendRelation -> {
-            if (!userFriendRelation.getUserId().equals(userId)) {
-                userIdList.add(userId);
-            }
+            userIdList.add(userFriendRelation.getUserId());
+            userIdList.add(userFriendRelation.getTargetUserId());
         });
         userIdList.forEach(id -> {
             UserVo userVo = getUserInfo(id);
-            if (userVo != null) {
+            if (userVo != null && !userVo.getUserId().equals(userId)) {
                 userVoList.add(userVo);
             }
         });
