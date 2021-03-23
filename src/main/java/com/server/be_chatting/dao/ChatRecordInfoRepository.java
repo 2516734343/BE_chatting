@@ -15,7 +15,7 @@ import com.server.be_chatting.domain.ChatRecordInfo;
  */
 @Mapper
 public interface ChatRecordInfoRepository extends BaseMapper<ChatRecordInfo> {
-    @Select("select * from chat_record_info where user_id = {userId} and target_user_id = #{targetUserId} and deleted"
+    @Select("select * from chat_record_info where user_id = #{userId} and target_user_id = #{targetUserId} and deleted"
             + " = 0 ")
     List<ChatRecordInfo> selectByUserIdAndTargetUserId(@Param("userId") Long userId,
             @Param("targetUserId") Long targetUserId);
