@@ -406,8 +406,14 @@ public class UserService {
         return RestListData.create(invitationCommentTopFiveVoList.size(), invitationCommentTopFiveVoList);
     }
 
-    public UserActionVo getUserActionList(Long userId) {
+    public UserActionVo getUserActionList(Long userId, String username) {
         UserActionVo userActionVo = new UserActionVo();
+        if (StringUtils.isNotEmpty(username)) {
+            UserInfo userInfo = userInfoRepository.selectByUserName(username);
+            if (userInfo != null) {
+                userId = userInfo.getId();
+            }
+        }
         List<Integer> likeNumList = Lists.newArrayList();
         List<Integer> commentNumList = Lists.newArrayList();
         List<Integer> releaseNumList = Lists.newArrayList();

@@ -166,11 +166,11 @@ public class UserController {
     }
 
     @GetMapping("invitation/user/action/list")
-    public RestRsp<UserActionVo> getUserActionList(Long userId) {
-        if (userId == null) {
-            throw ServiceException.of(ErrorCode.PARAM_INVALID, "userId不能为空");
+    public RestRsp<UserActionVo> getUserActionList(Long userId, String username) {
+        if (userId == null && StringUtils.isEmpty(username)) {
+            throw ServiceException.of(ErrorCode.PARAM_INVALID, "参数错误");
         }
-        return RestRsp.success(userService.getUserActionList(userId));
+        return RestRsp.success(userService.getUserActionList(userId, username));
     }
 
     @GetMapping("user/recommend/list")
