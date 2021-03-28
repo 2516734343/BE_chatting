@@ -14,7 +14,7 @@ public interface InvitationRepository extends BaseMapper<InvitationInfo> {
     @Select("select * from invitation_info where deleted = 0")
     List<InvitationInfo> selectListAll();
 
-    @Select("select * from invitation_info where invitation_id = #{invitationId} and user_id = #{userId} and deleted "
+    @Select("select * from invitation_info where id = #{invitationId} and user_id = #{userId} and deleted "
             + "= 0 limit 1")
     InvitationInfo selectByInvitationIdAndUserId(@Param("invitationId") Long invitationId,
             @Param("userId") Long userId);
