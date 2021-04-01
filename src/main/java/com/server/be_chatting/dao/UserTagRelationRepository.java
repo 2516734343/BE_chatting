@@ -22,7 +22,7 @@ public interface UserTagRelationRepository extends BaseMapper<UserTagRelation> {
             + "item='id' open='(' separator=',' close=')'> #{id} </foreach> and user_id != #{userId} </script>")
     List<UserTagRelation> selectByTagIdsAndOtherUserId(@Param("ids") List<Long> tagIds, @Param("userId") Long userId);
 
-    @Select("select count(*) as value,tag_id as id from user_tag_relation group by tag_id,deleted having deleted = 0")
+    @Select("select count(*) as value,tag_id as id from user_tag_relation group by tag_id,deleted having deleted = 0 order by value desc limit 10")
     List<UserTagDto> selectByTag();
 
 }
