@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.server.be_chatting.constant.ErrorCode;
 import com.server.be_chatting.dto.UserCityDto;
+import com.server.be_chatting.dto.UserTagDto;
 import com.server.be_chatting.exception.ServiceException;
 import com.server.be_chatting.param.PageRequestParam;
 import com.server.be_chatting.service.UserService;
@@ -249,5 +250,11 @@ public class UserController {
     public RestRsp<RestListData<UserCityDto>> getCityUserList() {
         return RestRsp.success(userService.getCityUserList());
     }
+
+    @GetMapping("tag/user/list")
+    public RestRsp<RestListData<UserTagDto>> getTagUserList() {
+        return RestRsp.success(userService.getTagUserList());
+    }
+
 
 }

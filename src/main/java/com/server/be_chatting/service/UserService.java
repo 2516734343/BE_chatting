@@ -41,6 +41,7 @@ import com.server.be_chatting.domain.UserInfo;
 import com.server.be_chatting.domain.UserTagRelation;
 import com.server.be_chatting.dto.InvitationRelationDto;
 import com.server.be_chatting.dto.UserCityDto;
+import com.server.be_chatting.dto.UserTagDto;
 import com.server.be_chatting.enums.DeleteStatusEnums;
 import com.server.be_chatting.enums.UserAddFriendStatusEnums;
 import com.server.be_chatting.exception.ServiceException;
@@ -629,5 +630,19 @@ public class UserService {
             return RestListData.create(0, Lists.newArrayList());
         }
         return RestListData.create(userCityDtoList.size(), userCityDtoList);
+    }
+
+    public RestListData<UserTagDto> getTagUserList() {
+        List<UserTagDto> userTagDtoList = userTagRelationRepository.selectByTag();
+        if (CollectionUtils.isEmpty(userTagDtoList)) {
+            return RestListData.create(0, Lists.newArrayList());
+        }
+        userTagDtoList.forEach(userTagDto -> {
+            TagInfo tagInfo = tagInfoRepository.selectByTagId(userTagDto.getId());
+            if (tagInfo != null) {
+                userTagDto.setName(tagInfo.getName());
+            }
+        });
+        return RestListData.create(userTagDtoList.size(), userTagDtoList);
     }
 }
