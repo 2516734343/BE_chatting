@@ -17,7 +17,7 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
     private InternalApiAuthInterceptor internalApiAuthInterceptor;
 
     @Override
-    public void addInterceptors(InterceptorRegistry registry) {
+    public void addInterceptors(InterceptorRegistry registry) { // 接口拦截
         registry.addInterceptor(internalApiAuthInterceptor)
                 .addPathPatterns("/api/be/chatting/**").excludePathPatterns("/api/be/chatting/common/**")
                 .excludePathPatterns("/api/be/chatting/websocket/**");

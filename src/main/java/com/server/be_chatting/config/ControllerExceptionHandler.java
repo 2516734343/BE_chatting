@@ -28,7 +28,7 @@ public class ControllerExceptionHandler {
 
     @ResponseBody
     @ExceptionHandler(BindException.class)
-    public RestRsp<Object> handleParameterException(BindException exception) {
+    public RestRsp<Object> handleParameterException(BindException exception) { // 异常抛出
         String errorMsg = "参数无效," + exception.getMessage();
         log.error(errorMsg);
         return ofMessage(ErrorCode.PARAM_INVALID, errorMsg);

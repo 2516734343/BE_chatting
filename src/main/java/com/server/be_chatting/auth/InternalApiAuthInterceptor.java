@@ -22,7 +22,7 @@ public class InternalApiAuthInterceptor extends HandlerInterceptorAdapter {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
         String tokenHeader = request.getHeader(ApiConst.AUTHENTICATION_TOKEN_HEADER_KEY);
-        if (TokenUtil.tokenValid(tokenHeader)) {
+        if (TokenUtil.tokenValid(tokenHeader)) { // tocken校验
             return true;
         }
         throw ServiceException.of(ErrorCode.UNAUTHORIZED, ERROR_MSG);
