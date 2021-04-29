@@ -11,6 +11,7 @@ https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html
 windows电脑：```jdk-8u202-windows-x64z``` 
 
 mac电脑可自行选择相关版本下载
+
 2. 安装Homebrew
 
 在命令行上输入： ```/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"```
